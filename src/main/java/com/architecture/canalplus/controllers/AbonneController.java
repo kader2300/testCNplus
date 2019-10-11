@@ -1,5 +1,6 @@
 package com.architecture.canalplus.controllers;
 
+import com.architecture.canalplus.dao.IAbonneRepository;
 import com.architecture.canalplus.model.Abonne;
 import com.architecture.canalplus.service.IAbonneService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +13,16 @@ import org.springframework.web.bind.annotation.*;
 public class AbonneController {
     @Autowired
     IAbonneService abonneService;
+    @
+    IAbonneRepository abonneRepository;
     @PutMapping("/ModifierAdresse")
     public ResponseEntity<Abonne> ModifierAdresse(String idAbonne,String adresse) {
+        Abonne abonne=abonneService.ModifierAdresseAbonne(adresse,idAbonne);
+        return new ResponseEntity<>(abonne, HttpStatus.OK);
+    }
+
+    @GetMapping("/ModifierAdresse")
+    public ResponseEntity<Abonne> get(String idAbonne,String adresse) {
         Abonne abonne=abonneService.ModifierAdresseAbonne(adresse,idAbonne);
         return new ResponseEntity<>(abonne, HttpStatus.OK);
     }
