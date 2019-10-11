@@ -6,6 +6,14 @@ import com.architecture.canalplus.model.Abonne;
 import com.architecture.canalplus.model.Contrat;
 import com.architecture.canalplus.service.IAbonneService;
 import com.architecture.canalplus.service.IContratService;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
+
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -13,11 +21,19 @@ import cucumber.api.java.en.When;
 
 import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class ModificationAdresseSteps extends SpringBootBaseIntegrationTest {
@@ -35,8 +51,8 @@ public class ModificationAdresseSteps extends SpringBootBaseIntegrationTest {
 	@Autowired
 	IAbonneService abonneService;
 
-//    private final WireMockServer wireMockServer = new WireMockServer();
-//    private final CloseableHttpClient httpClient = HttpClients.createDefault();
+    private final WireMockServer wireMockServer = new WireMockServer();
+    private final CloseableHttpClient httpClient = HttpClients.createDefault();
 
 
     @Given("^un abonné avec une adresse principale active en France")
@@ -94,19 +110,24 @@ public class ModificationAdresseSteps extends SpringBootBaseIntegrationTest {
 	}
 	@When("^le conseiller connecté à \"([^\"]*)\" modifie l'adresse de l'abonné sans date d'effet$")
 	public void leConseillerConnecteModifieAdresse(String canal) throws IOException {
-    /*  wireMockServer.start();
-        stubFor(put(urlEqualTo("Abonne/ModifierAdresse"))
-                .withHeader("content-type", equalTo("APPLICATION_JSON"))
-                .willReturn(aResponse().withStatus(200)));
 
-        HttpPut request = new HttpPut("http://localhost:8080/Abonne/ModifierAdresse");
-        request.addHeader("content-type","APPLICATION_JSON");
-        HttpResponse response = httpClient.execute(request);
-        assertEquals(200, response.getStatusLine().getStatusCode());
-*/
         abonne= abonneService.ModifierAdresseAbonne(newAdresse,canal);
         Assert.assertEquals(abonne.getAdresse(),newAdresse);
-		//wireMockServer.stop();
+
+        //Simuler les appels du webserver APIs en utilisant un mock server pour Cucumber
+		/**begin*/
+		wireMockServer.start();
+		configureFor("localhost", wireMockServer.port());
+		stubFor(put(urlEqualTo("/Abonne/ModifierAdresse?canal=" + canal + "adresse="+newAdresse))
+				.withHeader("content-type", equalTo("APPLICATION_JSON"))
+				.willReturn(aResponse().withStatus(200)));
+
+		HttpPut  request = new HttpPut("http://localhost:8080/Abonne/ModifierAdresse?canal=" + canal + "adresse="+newAdresse );
+		request.addHeader("content-type","APPLICATION_JSON");
+		HttpResponse response = httpClient.execute(request);
+		assertEquals(200, response.getStatusLine().getStatusCode());
+		wireMockServer.stop();
+		/**end**/
 
 
     }

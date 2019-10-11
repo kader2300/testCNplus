@@ -81,8 +81,8 @@
 
 		<dependency>
 			<groupId>com.github.tomakehurst</groupId>
-			<artifactId>wiremock-standalone</artifactId>
-			<version>2.6.0</version>
+			<artifactId>wiremock</artifactId>
+			<version>2.21.0</version>
 			<scope>test</scope>
 		</dependency>
 

@@ -8,22 +8,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("Abonne")
 public class AbonneController {
     @Autowired
     IAbonneService abonneService;
-    @
+    @Autowired
     IAbonneRepository abonneRepository;
     @PutMapping("/ModifierAdresse")
-    public ResponseEntity<Abonne> ModifierAdresse(String idAbonne,String adresse) {
-        Abonne abonne=abonneService.ModifierAdresseAbonne(adresse,idAbonne);
-        return new ResponseEntity<>(abonne, HttpStatus.OK);
-    }
-
-    @GetMapping("/ModifierAdresse")
-    public ResponseEntity<Abonne> get(String idAbonne,String adresse) {
-        Abonne abonne=abonneService.ModifierAdresseAbonne(adresse,idAbonne);
+    public ResponseEntity<Abonne> ModifierAdresse(@RequestParam(name = "canal") String canal,
+                                                  @RequestParam(name = "adresse")String adresse) {
+        Abonne abonne=abonneService.ModifierAdresseAbonne(adresse,canal);
         return new ResponseEntity<>(abonne, HttpStatus.OK);
     }
 }
